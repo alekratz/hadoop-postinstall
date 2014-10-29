@@ -219,6 +219,19 @@ function install {
     cat ~/.ssh/id_rsa.pub | ssh $NAMENODE 'cat >> ~/.ssh/authorized_keys; cat ~/.ssh/id_rsa.pub' >> ~/.ssh/authorized_keys
   fi
 
+# Confirm that we're connected to the internet by pinging google
+  echo '* Installing hadoop'
+  ping google.com -c 1 > /dev/null
+  if [[ $? -ne 0 ]]; then
+    print_skip
+  else
+    # I'm aware that it says "centos6" but it doesn't matter
+    wget -O /etc/yum.repos.d/bigtop.repo http://www.apache.org/dist/bigtop/stable/repos/centos6/bigtop.repo
+    # update repolist, then install hadoop
+    yum update -y
+    yum install hadoop\* -y
+  fi
+
 # Create patches
   echo '* Creating patches for rollback'
   mkdir ${PATCH_DIR} -p
