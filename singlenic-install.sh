@@ -66,15 +66,19 @@ if [[ $UID -ne '0' ]]; then
   exit 1
 fi
 
-if [[ $# -ne 1 ]]; then
-  echo "usage: $0 network-card"
+if [[ $# -ne 2 ]]; then
+  echo "usage: $0 network-card ip-address"
   exit 0
 fi
 
 card=$1
+ipaddr=$2
+card_config="/etc/sysconfig/network-scripts/ifcfg-$card"
+apply_subst 'BOOTPROTO="none"' 'BOOTPROTO="static"' $card_config
+apply_subst 'ONBOOT="no"' 'ONBOOT="yes"' $card_config
+add_line "IPADDR=\"$ipaddr\"" $card_config
+add_line 'NETMASK="255.255.255.0"' $card_config
 
-add_line "NETWORKING=yes" /etc/sysconfig/network
-add_line "GATEWAY=192.168.1.1" /etc/sysconfig/network
 service network restart
 pkill dhclient # kill dhclient because it will mess up the network if we don't
 # also remove networkmanager
