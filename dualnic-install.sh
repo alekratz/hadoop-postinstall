@@ -24,6 +24,13 @@ function add_line {
   fi
 }
 
+################################################################################
+
+if [[ $UID -ne '0' ]]; then
+  echo 'Must be run as root!'
+  exit 1
+fi
+
 if [[ $# -ne 2 ]]; then
   echo "usage: $0 card-internal card-external"
   echo "where card-internal is the network card used for the internal network and card-external is the card used for the external network"
