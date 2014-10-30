@@ -1,5 +1,5 @@
 #!/bin/bash
-# Hadoop dual-nic machine IP forwarding BS install
+# Hadoop dual-nic machine IP forwarding install
 # author: Alek Ratzloff
 #
 # Sets up IP forwarding for dual-nic machines
