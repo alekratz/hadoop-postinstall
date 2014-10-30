@@ -147,6 +147,8 @@ function get_yesno {
   done
 }
 
+###############################################################################
+
 function install {
 # Verify that user is root
   if [[ $UID -ne '0' ]]; then
