@@ -173,6 +173,15 @@ function install {
     echo
   fi
 
+  echo -n '* Verifying that user hadoop is in group wheel'
+  groups hadoop | grep wheel > /dev/null
+  if [[ $? -ne '0' ]]; then
+    usermod -a -G wheel hadoop
+    print_ok
+  else
+    echo
+  fi
+
   echo '* Applying changes'
 # Turn off SELinux
   apply_subst 'SELINUX=\(enforcing\|permissive\)' 'SELINUX=disabled' $SELINUX_DIR/config 'Turning off SELinux'
