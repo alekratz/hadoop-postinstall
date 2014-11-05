@@ -234,12 +234,13 @@ function install {
   echo '* Installing hadoop'
   ping google.com -c 1 > /dev/null
   if [[ $? -ne 0 ]]; then
+    echo 'No internet connection!'
     print_skip
   else
     # I'm aware that it says "centos6" but it doesn't matter
-    wget -O /etc/yum.repos.d/bigtop.repo http://www.apache.org/dist/bigtop/stable/repos/centos6/bigtop.repo
+    curl http://www.apache.org/dist/bigtop/stable/repos/centos6/bigtop.repo > /etc/yum.repos.d/bigtop.repo &&
     # update repolist, then install hadoop
-    yum update -y
+    yum update -y &&
     yum install hadoop\* -y
   fi
 

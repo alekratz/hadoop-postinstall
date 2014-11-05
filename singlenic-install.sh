@@ -83,3 +83,5 @@ service network restart
 pkill dhclient # kill dhclient because it will mess up the network if we don't
 # also remove networkmanager
 yum remove NetworkManager
+# restart the network
+service network restart
