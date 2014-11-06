@@ -82,6 +82,6 @@ add_line 'NETMASK="255.255.255.0"' $card_config
 service network restart
 pkill dhclient # kill dhclient because it will mess up the network if we don't
 # also remove networkmanager
-yum remove NetworkManager
+yum remove NetworkManager -y
 # restart the network
 service network restart
