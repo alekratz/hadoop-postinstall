@@ -2,7 +2,8 @@
 # Hadoop node post-install
 # author: Alek Ratzloff
 #
-# performs post-install operations on a hadoop cluster to correctly configure the machine
+# Performs post-install operations on a hadoop cluster to correctly configure the machine
+# Note that it does everything that needs to be done by root (e.g adding hadoop user, installing hadoop)
 # must be run as root!
 
 # SELinux directory
@@ -252,6 +253,7 @@ function install {
   for (( i = 0; i < ${#HOSTS[@]}; i++ )); do
     add_line "${HOSTS[$i]}" /etc/hosts
   done
+
 # Create patches
   echo '* Creating patches for rollback'
   mkdir ${PATCH_DIR} -p
