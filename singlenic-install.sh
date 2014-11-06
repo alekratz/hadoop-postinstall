@@ -79,7 +79,6 @@ apply_subst 'ONBOOT="no"' 'ONBOOT="yes"' $card_config
 add_line "IPADDR=\"$ipaddr\"" $card_config
 add_line 'NETMASK="255.255.255.0"' $card_config
 
-service network restart
 pkill dhclient # kill dhclient because it will mess up the network if we don't
 # also remove networkmanager
 yum remove NetworkManager -y
