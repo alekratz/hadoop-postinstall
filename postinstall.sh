@@ -5,32 +5,35 @@
 # performs post-install operations on a hadoop cluster to correctly configure the machine
 # must be run as root!
 
-# this may change
+# SELinux directory
 SELINUX_DIR=/etc/selinux
+# SSHD directory
 SSHD_DIR=/etc/ssh
+# Directories where backups/patches will be placed
 BACKUP_DIR=.installbackups
 PATCH_DIR=.installpatches
 
+# Terminal colors
 RED=$(tput setaf 1)
 GREEN=$(tput setaf 2)
 NORMAL=$(tput sgr0)
 COLS=80
 
-SYSFILES=("$SELINUX_DIR/config" "$SSHD_DIR/sshd_config" "/etc/fstab" "/etc/sysctl.conf" "/etc/security/limits.conf" "/etc/sysconfig/network")
-
+# System files that need to be backed up patches made
+SYSFILES=("$SELINUX_DIR/config" "$SSHD_DIR/sshd_config" "/etc/fstab" "/etc/sysctl.conf" "/etc/security/limits.conf" "/etc/sysconfig/network" "/etc/hosts")
 NAMENODE=192.168.1.1
 
-HOSTS='
-# Hadoop cluster info
-192.168.1.1		192.168.1.1		hydrogen
-192.168.1.2		192.168.1.2		helium
-192.168.1.3		192.168.1.3		lithium
-192.168.1.4		192.168.1.4		beryllium
-192.168.1.5		192.168.1.5		boron
-192.168.1.6		192.168.1.6		carbon
-192.168.1.7		192.168.1.7		nitrogen
-192.168.1.8		192.168.1.8		oxygen
-'
+# Hosts that will go into the hosts file
+HOSTS=(
+  "192.168.1.1    192.168.1.1  hydrogen"
+  "192.168.1.2    192.168.1.2  helium"
+  "192.168.1.3    192.168.1.3  lithium"
+  "192.168.1.4    192.168.1.4  beryllium"
+  "192.168.1.5    192.168.1.5  boron"
+  "192.168.1.6    192.168.1.6  carbon"
+  "192.168.1.7    192.168.1.7  nitrogen"
+  "192.168.1.8    192.168.1.8  oxygen"
+)
 
 function print_fail {
   # usage: print_fail
@@ -241,9 +244,14 @@ function install {
     curl http://www.apache.org/dist/bigtop/stable/repos/centos6/bigtop.repo > /etc/yum.repos.d/bigtop.repo &&
     # update repolist, then install hadoop
     yum update -y &&
-    yum install hadoop\* spark\* -y &&
+    yum install hadoop\* spark\* -y
   fi
 
+# Add the hosts line by line to the hosts file
+  echo '* Adding cluster hosts'
+  for (( i = 0; i < ${#HOSTS[@]}; i++ )); do
+    add_line "${HOSTS[$i]}" /etc/hosts
+  done
 # Create patches
   echo '* Creating patches for rollback'
   mkdir ${PATCH_DIR} -p
