@@ -194,7 +194,7 @@ function install {
 # Turn off some SSHD services to speed up SSH
   apply_subst '^\(GSSAPI[a-zA-Z]\+\) yes' '\1 no' $SSHD_DIR/sshd_config 'Turning off GSSAPI for SSHD' 
 # Turn off StrictHostKeyChecking in ssh config
-  apply_subst 'StrictHostKeyChecking yes' 'StrictHostKeyChecking no' $SSHD_DIR/ssh_config
+  add_line 'StrictHostKeyChecking no' $SSHD_DIR/ssh_config
 
 # Network stuff, read everything if you want to know what it's doing
   add_line 'net.ipv6.conf.all.disable_ipv6=1' /etc/sysctl.conf
