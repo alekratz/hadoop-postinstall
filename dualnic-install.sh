@@ -41,8 +41,9 @@ fi
 internal=$1
 external=$2
 
-iptables -A FORWARD -i $internal -j ACCEPT
-iptables -A FORWARD -o $external -j ACCEPT
+#
+firewall-cmd --permanent --direct --add-rule ipv4 filter FORWARD 0 -i enp12s2 -o enp11s0 -j ACCEPT
+
 add_line 'net.ipv4.ip_forward=1' /etc/sysctl.conf
 # Mask external requests from local LAN nodes with the IP address of the gateway
 echo "iptables -t nat -A POSTROUTING -o $external -j MASQUERADE" >> ~/.bashrc
