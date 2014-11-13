@@ -245,7 +245,7 @@ function install {
     curl http://www.apache.org/dist/bigtop/stable/repos/centos6/bigtop.repo > /etc/yum.repos.d/bigtop.repo &&
     # update repolist, then install hadoop
     yum update -y &&
-    yum install hadoop\* spark\* -y &&
+    yum install hadoop\* spark\* java-1.7.0-openjdk-devel -y &&
     chgrp wheel /etc/hadoop -R &&
     chmod 775 /etc/hadoop -R
   fi
