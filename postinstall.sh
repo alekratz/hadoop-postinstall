@@ -235,7 +235,7 @@ function install {
   fi
 
 # Confirm that we're connected to the internet by pinging google
-  echo '* Installing hadoop'
+  echo '* Installing hadoop, java'
   ping google.com -c 1 > /dev/null
   if [[ $? -ne 0 ]]; then
     echo 'No internet connection!'
@@ -249,6 +249,9 @@ function install {
     chgrp wheel /etc/hadoop -R &&
     chmod 775 /etc/hadoop -R
   fi
+
+# Add the java_home line to the .bashrc of the hadoop user
+  add_line 'export JAVA_HOME=/etc/alternatives/jre' /home/hadoop/.bashrc
 
 # Add the hosts line by line to the hosts file
   echo '* Adding cluster hosts'
