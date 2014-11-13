@@ -252,6 +252,8 @@ function install {
 
 # Add the java_home line to the .bashrc of the hadoop user
   add_line 'export JAVA_HOME=/etc/alternatives/jre' /home/hadoop/.bashrc
+  add_line 'export HADOOP_PREFIX=/usr/lib/hadoop' /home/hadoop/.bashrc
+  add_line 'export PATH="$PATH:$HADOOP_PREFIX/sbin:$HADDOP_PREFIX/bin"' /home/hadoop/.bashrc
 
 # Add the hosts line by line to the hosts file
   echo '* Adding cluster hosts'
