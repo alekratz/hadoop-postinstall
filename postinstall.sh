@@ -188,6 +188,10 @@ function install {
     echo
   fi
 
+# Add a few important environment variables to the user's bash_profile
+  add_line 'export HADOOP_CONF_DIR=/etc/hadoop' /home/hadoop/.bash_profile
+  add_line 'export HADOOP_LOG_DIR=$HOME/hadoop-logs' /home/hadoop/.bash_profile
+
   echo '* Applying changes'
 # Turn off SELinux
   apply_subst 'SELINUX=\(enforcing\|permissive\)' 'SELINUX=disabled' $SELINUX_DIR/config 'Turning off SELinux'
