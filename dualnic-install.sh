@@ -41,9 +41,55 @@ fi
 internal=$1
 external=$2
 
-#
-firewall-cmd --permanent --direct --add-rule ipv4 filter FORWARD 0 -i enp12s2 -o enp11s0 -j ACCEPT
-
 add_line 'net.ipv4.ip_forward=1' /etc/sysctl.conf
 # Mask external requests from local LAN nodes with the IP address of the gateway
-echo "iptables -t nat -A POSTROUTING -o $external -j MASQUERADE" >> ~/.bashrc
+
+# CentOS 6+ uses firewalld by default. Unfortunately, firewalld is a crock of convoluted BS, so we're going to stick to tried-and-true IP tables.
+# Detect if we need to disable firewalld and enable iptables
+systemctl status firewalld > /dev/null
+if [[ $? -eq 0 ]]; then
+  echo "Stopping and disabling firewalld..."
+  systemctl stop firewalld
+# mask will make sure that firewalld will never ever run unless we explicitly tell it to
+  systemctl mask firewalld
+  echo "Starting and enabling iptables..."
+  systemctl enable iptables
+  systemctl start iptables
+fi
+
+in_fwd_rule="FORWARD -i $internal -j ACCEPT"
+out_fwd_rule="FORWARD -o $external -j ACCEPT"
+drop_icmp_rule="FORWARD -j REJECT --reject-with icmp-host-prohibited"
+masq_rule="POSTROUTING -o $external -j MASQUERADE"
+
+# Get whether or not some rules need to be added
+# if the in or out forward rules haven't been defined, then we need to get rid of the drop_icmp rule and add it again
+iptables -S FORWARD | grep -e "$in_fwd_rule" > /dev/null
+in_fwd_exists=$?
+iptables -S FORWARD | grep -e "$out_fwd_rule" > /dev/null
+out_fwd_exists=$?
+
+if (( $in_fwd_exists == 1 || $out_fwd_exists == 1)); then
+# one of the rules does not exist in the iptables, so delete the icmp drop rule, delete both of the rules (if possible)
+# and re-add the icmp drop rule
+  echo "Adding iptables forwarding rules"
+  iptables -D $drop_icmp_rule > /dev/null # we really don't care if it fails or not
+  iptables -D $in_fwd_rule > /dev/null
+  iptables -D $out_fwd_rule > /dev/null
+  iptables -A $in_fwd_rule
+  iptables -A $out_fwd_rule
+  iptables -A $drop_icmp_rule
+fi
+
+# now check to see if the masquerade rule exists
+iptables -t nat -S POSTROUTING | grep -e "$masq_rule" > /dev/null
+masq_exists=$?
+
+if (( $masq_exists == 1 )); then
+  echo "Adding iptables masquerade rules"
+# masquerade rule does not exist, so add it here
+  iptables -t nat -A $masq_rule
+fi
+
+# finally save the tables
+iptables-save > /etc/sysconfig/iptables
