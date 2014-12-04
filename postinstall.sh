@@ -19,6 +19,7 @@ RED=$(tput setaf 1)
 GREEN=$(tput setaf 2)
 NORMAL=$(tput sgr0)
 COLS=80
+HADOOP_INSTALL_DIR='/home/hadoop'
 
 # System files that need to be backed up patches made
 SYSFILES=("$SELINUX_DIR/config" "$SSHD_DIR/sshd_config" "/etc/fstab" "/etc/sysctl.conf" "/etc/security/limits.conf" "/etc/sysconfig/network" "/etc/hosts")
@@ -188,6 +189,11 @@ function install {
     echo
   fi
 
+# Add a few important environment variables to the user's bash_profile
+  add_line 'export JAVA_HOME=/etc/alternatives/jre' /home/hadoop/.bash_profile
+  add_line 'export HADOOP_PREFIX=$HOME/hadoop' /home/hadoop/.bash_profile
+  add_line 'export PATH="$PATH:$HADOOP_PREFIX/sbin:$HADOOP_PREFIX/bin"' /home/hadoop/.bash_profile
+  
   echo '* Applying changes'
 # Turn off SELinux
   apply_subst 'SELINUX=\(enforcing\|permissive\)' 'SELINUX=disabled' $SELINUX_DIR/config 'Turning off SELinux'
@@ -241,19 +247,29 @@ function install {
     echo 'No internet connection!'
     print_skip
   else
-    # I'm aware that it says "centos6" but it doesn't matter
-    curl http://www.apache.org/dist/bigtop/stable/repos/centos6/bigtop.repo > /etc/yum.repos.d/bigtop.repo &&
-    # update repolist, then install hadoop
-    yum update -y &&
-    yum install hadoop\* spark\* java-1.7.0-openjdk-devel -y &&
-    chgrp wheel /etc/hadoop -R &&
-    chmod 775 /etc/hadoop -R
-  fi
+    # Check to see if we need to install hadoop
+    if [[ -d $HADOOP_INSTALL_DIR/hadoop ]]; then
+      echo -n 'Hadoop already installed'
+      print_skip
+    else
+      # Get the hadoop tarball
+      wget http://www.carfab.com/apachesoftware/hadoop/common/hadoop-2.5.2/hadoop-2.5.2.tar.gz &&
+      # Unpack
+      tar xf hadoop-2.5.2.tar.gz &&
+      # Move it over
+      mv hadoop-2.5.2 $HADOOP_INSTALL_DIR/hadoop &&
+      # Delete the tarball
+      rm hadoop-2.5.2.tar.gz &&
+      # Change permissions
+      chown -R hadoop $HADOOP_INSTALL_DIR ||
+      # Failure message, if anything went wrong
+      print_fail
+    fi
 
-# Add the java_home line to the .bashrc of the hadoop user
-  add_line 'export JAVA_HOME=/etc/alternatives/jre' /home/hadoop/.bashrc
-  add_line 'export HADOOP_PREFIX=/usr/lib/hadoop' /home/hadoop/.bashrc
-  add_line 'export PATH="$PATH:$HADOOP_PREFIX/sbin:$HADDOP_PREFIX/bin"' /home/hadoop/.bashrc
+    # Also install java
+    yum install java-1.7.0-openjdk-devel -y ||
+    print_fail
+  fi
 
 # Add the hosts line by line to the hosts file
   echo '* Adding cluster hosts'
