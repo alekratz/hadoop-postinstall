@@ -90,3 +90,6 @@ if (( $masq_exists == 1 )); then
 # masquerade rule does not exist, so add it here
   iptables -t nat -A $masq_rule
 fi
+
+# finally save the tables
+iptables-save > /etc/sysconfig/iptables
