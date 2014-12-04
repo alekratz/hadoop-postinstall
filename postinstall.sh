@@ -247,7 +247,11 @@ function install {
     echo 'No internet connection!'
     print_skip
   else
-    # Check to see if we need to install hadoop
+    # Install java/wget
+    yum install java-1.7.0-openjdk-devel wget -y ||
+    print_fail
+
+    # Also check to see if we need to install hadoop
     if [[ -d $HADOOP_INSTALL_DIR/hadoop ]]; then
       echo -n 'Hadoop already installed'
       print_skip
@@ -265,10 +269,6 @@ function install {
       # Failure message, if anything went wrong
       print_fail
     fi
-
-    # Also install java
-    yum install java-1.7.0-openjdk-devel -y ||
-    print_fail
   fi
 
 # Add the hosts line by line to the hosts file
