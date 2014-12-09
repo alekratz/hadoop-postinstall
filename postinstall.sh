@@ -189,11 +189,15 @@ function install {
     echo
   fi
 
-# Add a few important environment variables to the user's bash_profile
+# Add a few important environment variables to the user's bash_profile/bashrc
   add_line 'export JAVA_HOME=/etc/alternatives/jre' /home/hadoop/.bash_profile
   add_line 'export HADOOP_PREFIX=$HOME/hadoop' /home/hadoop/.bash_profile
   add_line 'export PATH="$PATH:$HADOOP_PREFIX/sbin:$HADOOP_PREFIX/bin"' /home/hadoop/.bash_profile
-  
+  add_line 'export JAVA_HOME=/etc/alternatives/jre' /home/hadoop/.bashrc
+  add_line 'export HADOOP_PREFIX=$HOME/hadoop' /home/hadoop/.bashrc
+  add_line 'export PATH="$PATH:$HADOOP_PREFIX/sbin:$HADOOP_PREFIX/bin"' /home/hadoop/.bashrc
+
+
   echo '* Applying changes'
 # Turn off SELinux
   apply_subst 'SELINUX=\(enforcing\|permissive\)' 'SELINUX=disabled' $SELINUX_DIR/config 'Turning off SELinux'
