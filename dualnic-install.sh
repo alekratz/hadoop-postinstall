@@ -59,26 +59,21 @@ fi
 
 in_fwd_rule="FORWARD -i $internal -j ACCEPT"
 out_fwd_rule="FORWARD -o $external -j ACCEPT"
-drop_icmp_rule="FORWARD -j REJECT --reject-with icmp-host-prohibited"
 masq_rule="POSTROUTING -o $external -j MASQUERADE"
 
 # Get whether or not some rules need to be added
-# if the in or out forward rules haven't been defined, then we need to get rid of the drop_icmp rule and add it again
+# If they do, then delete all of them and insert them all at the top
 iptables -S FORWARD | grep -e "$in_fwd_rule" > /dev/null
 in_fwd_exists=$?
 iptables -S FORWARD | grep -e "$out_fwd_rule" > /dev/null
 out_fwd_exists=$?
 
 if (( $in_fwd_exists == 1 || $out_fwd_exists == 1)); then
-# one of the rules does not exist in the iptables, so delete the icmp drop rule, delete both of the rules (if possible)
-# and re-add the icmp drop rule
   echo "Adding iptables forwarding rules"
-  iptables -D $drop_icmp_rule > /dev/null # we really don't care if it fails or not
   iptables -D $in_fwd_rule > /dev/null
   iptables -D $out_fwd_rule > /dev/null
-  iptables -A $in_fwd_rule
-  iptables -A $out_fwd_rule
-  iptables -A $drop_icmp_rule
+  iptables -I $in_fwd_rule
+  iptables -I $out_fwd_rule
 fi
 
 # now check to see if the masquerade rule exists
@@ -88,7 +83,7 @@ masq_exists=$?
 if (( $masq_exists == 1 )); then
   echo "Adding iptables masquerade rules"
 # masquerade rule does not exist, so add it here
-  iptables -t nat -A $masq_rule
+  iptables -t nat -I $masq_rule
 fi
 
 # finally save the tables

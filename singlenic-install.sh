@@ -79,6 +79,29 @@ apply_subst 'ONBOOT="no"' 'ONBOOT="yes"' $card_config
 add_line "IPADDR=\"$ipaddr\"" $card_config
 add_line 'NETMASK="255.255.255.0"' $card_config
 
+# Detect if we need to disable firewalld and enable iptables
+systemctl status firewalld > /dev/null
+if [[ $? -eq 0 ]]; then
+  echo "Stopping and disabling firewalld..."
+  systemctl stop firewalld
+# mask will make sure that firewalld will never ever run unless we explicitly tell it to
+  systemctl mask firewalld
+  echo "Starting and enabling iptables..."
+  systemctl enable iptables
+  systemctl start iptables
+fi
+
+in_input_rule="INPUT -i $card -j ACCEPT"
+iptables -S INPUT | grep -e "$in_input_rule" > /dev/null
+in_input_exists=$?
+
+if (( $in_input_exists == 1 )); then
+  echo "Adding iptables forwarding rules"
+  iptables -I $in_input_rule
+fi
+# save the iptables
+iptables-save > /etc/sysconfig/iptables
+
 pkill dhclient # kill dhclient because it will mess up the network if we don't
 # also remove networkmanager
 yum remove NetworkManager -y
