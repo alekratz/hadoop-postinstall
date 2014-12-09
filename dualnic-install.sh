@@ -60,6 +60,7 @@ fi
 
 in_fwd_rule="FORWARD -i $internal -j ACCEPT"
 out_fwd_rule="FORWARD -o $external -j ACCEPT"
+in_input_rule="INPUT -i $internal -j ACCEPT"
 masq_rule="POSTROUTING -o $external -j MASQUERADE"
 
 # Get whether or not some rules need to be added
@@ -85,6 +86,14 @@ if (( $masq_exists == 1 )); then
   echo "Adding iptables masquerade rules"
 # masquerade rule does not exist, so add it here
   iptables -t nat -I $masq_rule
+fi
+
+# check to see if the input rule needs to be added
+iptables -S INPUT | grep -e "$in_input_rule" > /dev/null
+input_exists=$?
+if (( $input_exists == 1 )); then
+  echo "Adding iptables input rules"
+  iptables -I $in_input_rule
 fi
 
 # finally save the tables
