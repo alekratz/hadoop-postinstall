@@ -52,7 +52,7 @@ if [[ $? -eq 0 ]]; then
   systemctl stop firewalld
 # mask will make sure that firewalld will never ever run unless we explicitly tell it to
   systemctl mask firewalld
-  yum install iptables-services
+  yum install iptables-services -y
   echo "Starting and enabling iptables..."
   systemctl enable iptables
   systemctl start iptables
