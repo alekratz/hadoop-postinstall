@@ -27,14 +27,17 @@ NAMENODE=192.168.1.1
 
 # Hosts that will go into the hosts file
 HOSTS=(
-  "192.168.1.1 hydrogen"
-  "192.168.1.2 helium"
-  "192.168.1.3 lithium"
-  "192.168.1.4 beryllium"
-  "192.168.1.5 boron"
-  "192.168.1.6 carbon"
-  "192.168.1.7 nitrogen"
-  "192.168.1.8 oxygen"
+  "192.168.1.1   hydrogen"
+  "192.168.1.2   helium"
+  "192.168.1.3   lithium"
+  "192.168.1.4   beryllium"
+  "192.168.1.5   boron"
+  "192.168.1.6   carbon"
+  "192.168.1.7   nitrogen"
+  "192.168.1.8   oxygen"
+  "192.168.1.9   fluorine"
+  "192.168.1.10  neon"
+  "192.168.1.11  sodium"
 )
 
 function print_fail {
