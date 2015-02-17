@@ -17,7 +17,7 @@ def add_line(path, line):
     print "Appending", line, "to", path, '...',
     if line not in contents:
       # append the line if it doesn't exist in the contents
-      fp.write(line)
+      fp.write(line + "\n")
       print 'OK'
     else:
       print 'SKIP'
@@ -116,7 +116,7 @@ def install():
   print '* Applying changes'
   # Apply misc changes
   # Disable SELinux
-  apply_subst("/etc/selinux/config", r"SELINUX=(enforcing|permissive)", r"SELINUX=disabled")
+  apply_subst("/etc/selinux/config", r"(SELINUX=(enforcing|permissive))?", r"SELINUX=disabled")
   # Turn off SSHD services
   apply_subst("/etc/ssh/sshd_config", r"^(GSSAPI[a-zA-Z]+) yes", r"\1 no")
   add_line("/etc/ssh/ssh_config", "StrickHostKeyChecking no")
@@ -140,14 +140,14 @@ def install():
   # Run some system commands
   if not exists(join(HADOOP_HOME, ".ssh", "id_rsa.pub")):
     print '* Generating SSH key'
-    system("ssh-keygen", fail_msg="could not generate SSH key")
+    system("su hadoop -c 'ssh-keygen'", fail_msg="could not generate SSH key")
 
   print '* Installing hadoop, java'
   # Confirm that we're connected to the internet by pinging google.com
   system("ping google.com -c 1", fail_msg="not connected to the internet, make sure you are connected!")
   system("yum install java-1.7.0-openjdk-devel wget -y", fail_msg="could not install Java and wget")
   
-  if exists(join(HADOOP_HOME), "hadoop"):
+  if exists(join(HADOOP_HOME, "hadoop")):
     print 'Hadoop is already installed, skipping'
   else:
     system("wget " + HADOOP_MIRROR, fail_msg="could not download Hadoop. Change the Hadoop script to download from a different mirror.")
@@ -157,3 +157,6 @@ def install():
     system("chown hadoop " + join(HADOOP_HOME, "hadoop"))
   
   # TODO : add hosts to /etc/hosts
+
+if __name__ == "__main__":
+	install()
