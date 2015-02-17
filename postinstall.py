@@ -30,7 +30,7 @@ def apply_subst(path, pattern, replace):
   with open(path, 'w+') as fp:
     contents = fp.read()
     print 'Applying substitution to', path, '...',
-    if !re.search(pattern, contents):
+    if not re.search(pattern, contents):
       print "SKIP (pattern not found)"
     else:
       contents = re.sub(pattern, replace, contents)
