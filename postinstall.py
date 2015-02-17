@@ -1,4 +1,4 @@
-#ee/usr/bin/env python2
+#!/usr/bin/env python2
 import os, sys, shutil
 import re
 from os.path import *
