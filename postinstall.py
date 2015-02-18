@@ -119,7 +119,7 @@ def install():
   apply_subst("/etc/selinux/config", r"(SELINUX=(enforcing|permissive))?", r"SELINUX=disabled")
   # Turn off SSHD services
   apply_subst("/etc/ssh/sshd_config", r"^(GSSAPI[a-zA-Z]+) yes", r"\1 no")
-  add_line("/etc/ssh/ssh_config", "StrickHostKeyChecking no")
+  add_line("/etc/ssh/ssh_config", "StrictHostKeyChecking no")
   # Network stuff
   add_line("/etc/sysctl.conf", "net.ipv6.conf.all.disable_ipv6=1")
   add_line("/etc/sysctl.conf", "net.ipv6.default.disable_ipv6=1")
