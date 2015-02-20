@@ -134,8 +134,8 @@ def install():
   add_line("/etc/security/limits.conf", 'hadoop\thard\tnproc\t\t65536')
   add_line("/etc/security/limits.conf", 'hadoop\tsort\tnproc\t\t65536')
   # Filesystem noatime flags
-  apply_subst("/etc/fstab", 
-    r"\(\/dev\/mapper\/centos-[a-z]\+ \/[a-z]*[\t ]\+[a-z]\+[\t ]\+\)defaults", r"\1defaults,noatime")
+#  apply_subst("/etc/fstab", 
+#    r"\(\/dev\/mapper\/centos-[a-z]\+ \/[a-z]*[\t ]\+[a-z]\+[\t ]\+\)defaults", r"\1defaults,noatime")
   
   # Run some system commands
   if not exists(join(HADOOP_HOME, ".ssh", "id_rsa.pub")):
