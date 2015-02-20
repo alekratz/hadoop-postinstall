@@ -265,7 +265,7 @@ function install {
       print_skip
     else
       # Get the hadoop tarball
-      wget http://www.carfab.com/apachesoftware/hadoop/common/hadoop-2.5.2/hadoop-2.5.2.tar.gz &&
+      wget http://mirror.metrocast.net/apache/hadoop/common/hadoop-2.5.2/hadoop-2.5.2.tar.gz &&
       # Unpack
       tar xf hadoop-2.5.2.tar.gz &&
       # Move it over
